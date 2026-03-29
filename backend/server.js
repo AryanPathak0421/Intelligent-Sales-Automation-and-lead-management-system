@@ -16,12 +16,22 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    origin: [
+        'https://intelligent-sales-automation-and-le.vercel.app',
+        'http://localhost:5173',
+        process.env.FRONTEND_URL
+    ].filter(Boolean),
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+app.options('*', cors()); // Enable preflight for all routes
 app.use(morgan('dev'));
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy: false,
+    crossOriginEmbedderPolicy: false
+}));
 
 // Routes
 const leadRoutes = require('./routes/leadRoutes');
