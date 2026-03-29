@@ -24,7 +24,7 @@ const leadSchema = new mongoose.Schema({
     }],
 }, { timestamps: true });
 
-leadSchema.pre('save', function (next) {
+leadSchema.pre('save', function () {
     if (this.score >= 80) {
         this.classification = 'Hot';
     } else if (this.score >= 40) {
@@ -32,7 +32,6 @@ leadSchema.pre('save', function (next) {
     } else {
         this.classification = 'Cold';
     }
-    next();
 });
 
 module.exports = mongoose.model('Lead', leadSchema);

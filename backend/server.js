@@ -15,16 +15,20 @@ runBackupScheduler();
 const app = express();
 
 app.use(express.json());
+
+// Robust CORS Configuration
+const allowedOrigins = [
+    'https://intelligent-sales-automation-and-le.vercel.app',
+    'http://localhost:5173',
+    ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',').map(o => o.trim()) : [])
+];
+
 app.use(cors({
     origin: function (origin, callback) {
-        // Splitting env variable in case it contains multiple comma-separated URLs
-        const envOrigins = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',').map(o => o.trim()) : [];
-        const allowedOrigins = [
-            'https://intelligent-sales-automation-and-le.vercel.app',
-            'http://localhost:5173',
-            ...envOrigins
-        ];
-        if (!origin || allowedOrigins.includes(origin)) {
+        // Allow requests with no origin (like mobile apps/curl)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
             callback(new Error('CORS BLOCK: Security Layer Triggered'));
@@ -32,10 +36,9 @@ app.use(cors({
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
-// CORS already handled by app.use(cors(...)) above
 app.use(morgan('dev'));
 app.use(helmet({
     crossOriginResourcePolicy: false,

@@ -34,7 +34,11 @@ const createLead = async (req, res) => {
 
         res.status(201).json(savedLead);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('CREATE LEAD ERROR:', error);
+        res.status(500).json({
+            message: 'Lead creation halted by Internal Error',
+            details: error.message
+        });
     }
 };
 
