@@ -16,11 +16,18 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-    origin: [
-        'https://intelligent-sales-automation-and-le.vercel.app',
-        'http://localhost:5173',
-        process.env.FRONTEND_URL
-    ].filter(Boolean),
+    origin: function (origin, callback) {
+        const allowedOrigins = [
+            'https://intelligent-sales-automation-and-le.vercel.app',
+            'http://localhost:5173',
+            process.env.FRONTEND_URL?.trim()
+        ];
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('CORS BLOCK: Security Layer Triggered'));
+        }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
