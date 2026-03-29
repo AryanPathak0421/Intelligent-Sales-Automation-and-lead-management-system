@@ -17,10 +17,12 @@ const app = express();
 app.use(express.json());
 app.use(cors({
     origin: function (origin, callback) {
+        // Splitting env variable in case it contains multiple comma-separated URLs
+        const envOrigins = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',').map(o => o.trim()) : [];
         const allowedOrigins = [
             'https://intelligent-sales-automation-and-le.vercel.app',
             'http://localhost:5173',
-            process.env.FRONTEND_URL?.trim()
+            ...envOrigins
         ];
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
@@ -33,7 +35,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.options('*', cors()); // Enable preflight for all routes
+// CORS already handled by app.use(cors(...)) above
 app.use(morgan('dev'));
 app.use(helmet({
     crossOriginResourcePolicy: false,
